@@ -50,7 +50,7 @@ void log_titles() {
     FILE * output = fopen("titles.h", "wb");
     fprintf(output, "#include <3ds.h>\n\nconst AM_TitleEntry titles[] = {\n");
     for (u32 i = 0; i < installed_title_count; i++) {
-        fprintf(output, "    {0x%016llxLL, 0x%016llxLL, 0x%04x},\n", installed_titles[i].titleID, installed_titles[i].size, installed_titles[i].version);
+        fprintf(output, "    {0x%016llxLL, 0x0LL, 0x%04x},\n", installed_titles[i].titleID, installed_titles[i].version);
     }
     fprintf(output, "};\n\n");
     fprintf(output, "const u32 title_count = %lu;\n\n", installed_title_count);
@@ -78,7 +78,7 @@ void check_titles() {
     for (u32 i = 0; i < installed_title_count; i++) {
         for (u32 j = 0; j < title_count; j++) {
             if (installed_titles[i].titleID == titles[j].titleID) {
-                if ((installed_titles[i].size != titles[j].size) || (installed_titles[i].version != titles[j].version)) {
+                if (installed_titles[i].version != titles[j].version) {
                     printf("    Mismatched title ID 0x%016llx\n", titles[j].titleID);
                     refresh();
                     fprintf(output, "Misatched title ID 0x%016llx\n", titles[j].titleID);
