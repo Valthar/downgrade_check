@@ -50,6 +50,8 @@ void log_titles() {
     FILE * output = fopen("titles.h", "wb");
     fprintf(output, "#include <3ds.h>\n\nconst AM_TitleEntry titles[] = {\n");
     for (u32 i = 0; i < installed_title_count; i++) {
+        if ((installed_titles[i].titleID & 0xffffffff00000000LL) == 0x0004800400000000LL)
+            continue;
         fprintf(output, "    {0x%016llxLL, 0x0LL, 0x%04x},\n", installed_titles[i].titleID, installed_titles[i].version);
     }
     fprintf(output, "};\n\n");
@@ -76,21 +78,29 @@ void check_titles() {
     u8 found = 0;
     FILE * output = fopen("check.log", "wb");
     for (u32 i = 0; i < installed_title_count; i++) {
+        if ((installed_titles[i].titleID & 0xffffffff00000000LL) == 0x0004800400000000LL)
+            continue;
         for (u32 j = 0; j < title_count; j++) {
             if (installed_titles[i].titleID == titles[j].titleID) {
                 if (installed_titles[i].version != titles[j].version) {
-                    printf("    Mismatched title ID 0x%016llx\n", titles[j].titleID);
+                    printf("  Title ID 0x%016llx\n", titles[j].titleID);
+                    printf("    Expected version 0x%04x\n", titles[j].version);
+                    printf("    Installed version 0x%04x\n", installed_titles[i].version);
                     refresh();
-                    fprintf(output, "Misatched title ID 0x%016llx\n", titles[j].titleID);
+                    fprintf(output, "Title ID 0x%016llx\n", titles[j].titleID);
+                    fprintf(output, "  Expected version 0x%04x\n", titles[j].version);
+                    fprintf(output, "  Installed version 0x%04x\n", installed_titles[i].version);
                 }
                 found = 1;
                 break;
             }
         }
         if (found == 0) {
-            printf("    Extra title ID 0x%016llx\n", installed_titles[i].titleID);
+            printf("  Title ID 0x%016llx\n", installed_titles[i].titleID);
+            printf("    Extra title\n");
             refresh();
-            fprintf(output, "Extra title ID 0x%016llx\n", installed_titles[i].titleID);
+            fprintf(output, "Title ID 0x%016llx\n", installed_titles[i].titleID);
+            fprintf(output, "  Extra title\n");
         }
         found = 0;
     }
@@ -105,9 +115,11 @@ void check_titles() {
             }
         }
         if (found == 0) {
-            printf("    Missing title ID 0x%016llx\n", titles[i].titleID);
+            printf("  Title ID 0x%016llx\n", titles[i].titleID);
+            printf("    Missing title\n");
             refresh();
-            fprintf(output, "Missing title ID 0x%016llx\n", titles[i].titleID);
+            fprintf(output, "Title ID 0x%016llx\n", titles[i].titleID);
+            fprintf(output, "  Missing title\n");
         }
         found = 0;
     }
