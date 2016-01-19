@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <3ds.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "titles.h"
+
+AM_TitleEntry * titles = NULL;
+u32 title_count = 0;
 
 void refresh() {
     gspWaitForVBlank();
@@ -47,19 +49,44 @@ void log_titles() {
     AM_ListTitles(MEDIATYPE_NAND, installed_title_count, installed_title_ids, installed_titles);
     amExit();
     free(installed_title_ids);
-    FILE * output = fopen("titles.h", "wb");
-    fprintf(output, "#include <3ds.h>\n\nconst AM_TitleEntry titles[] = {\n");
+    FILE * output = fopen("title_lists.py", "wb");
+    fprintf(output, "title_lists = {\n    'my_title_list.bin': (\n");
     for (u32 i = 0; i < installed_title_count; i++) {
         if ((installed_titles[i].titleID & 0xffffffff00000000LL) == 0x0004800400000000LL)
             continue;
-        fprintf(output, "    {0x%016llxLL, 0x0LL, 0x%04x},\n", installed_titles[i].titleID, installed_titles[i].version);
+        if ((i % 5) == 0)
+            fprintf(output, "        ");
+        fprintf(output, "(0x%016llx, 0x%04x),", installed_titles[i].titleID, installed_titles[i].version);
+        if (((i + 1) % 5) == 0 || i == (installed_title_count - 1))
+            fprintf(output, "\n");
+        else
+            fprintf(output, " ");
     }
-    fprintf(output, "};\n\n");
-    fprintf(output, "const u32 title_count = %lu;\n\n", installed_title_count);
+    fprintf(output, "    ),\n}\n");
     fclose(output);
     free(installed_titles);
     printf("complete.\n");
     refresh();
+}
+
+void load_titles() {
+    u8 is_new = 0;
+    APT_CheckNew3DS(&is_new);
+    OS_VersionBin nver, cver;
+    osGetSystemVersionData(&nver, &cver);
+    char titles_binary_file[30];
+    sprintf(titles_binary_file, "%s_%u.%u.%u-%u%c.bin", is_new ? "n3ds" : "o3ds", cver.mainver, cver.minor, cver.build, nver.mainver, nver.region);
+    FILE * titles_binary = fopen(titles_binary_file, "rb");
+    fread(&title_count, 4, 1, titles_binary);
+    titles = malloc(title_count * sizeof(AM_TitleEntry));
+    fread(titles, sizeof(AM_TitleEntry), title_count, titles_binary);
+    fclose(titles_binary);
+}
+
+void free_titles() {
+    free(titles);
+    titles = NULL;
+    title_count = 0;
 }
 
 void check_titles() {
@@ -137,7 +164,9 @@ int main() {
         hidScanInput();
         u32 kDown = hidKeysDown();
         if (kDown & KEY_A) {
+            load_titles();
             check_titles();
+            free_titles();
             svcSleepThread(5000000000);
             display_menu();
         }
