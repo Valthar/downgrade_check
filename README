@@ -1,4 +1,10 @@
 This homebrew will check all your installed NAND titles and compare them to the
-ones that "should" be installed on 9.2.0-20U. It will display any differences
+ones that "should" be installed on your system. It will display any differences
 when checking but it will also output them to a file called "check.log" inside
 this homebrew's folder.
+
+It currently supports versions:
+  * N3DS 9.0.0-20J/E/U
+  * N3DS 9.1.0-20J
+  * N3DS 9.2.0-20J/E/U
+  * O3DS 9.2.0-20E/U
