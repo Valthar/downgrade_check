@@ -69,7 +69,7 @@ void log_titles() {
     refresh();
 }
 
-void load_titles() {
+int load_titles() {
     u8 is_new = 0;
     APT_CheckNew3DS(&is_new);
     OS_VersionBin nver, cver;
@@ -77,10 +77,18 @@ void load_titles() {
     char titles_binary_file[30];
     sprintf(titles_binary_file, "%s_%u.%u.%u-%u%c.bin", is_new ? "n3ds" : "o3ds", cver.mainver, cver.minor, cver.build, nver.mainver, nver.region);
     FILE * titles_binary = fopen(titles_binary_file, "rb");
-    fread(&title_count, 4, 1, titles_binary);
-    titles = malloc(title_count * sizeof(AM_TitleEntry));
-    fread(titles, sizeof(AM_TitleEntry), title_count, titles_binary);
-    fclose(titles_binary);
+    if (titles_binary) {
+        fread(&title_count, 4, 1, titles_binary);
+        titles = malloc(title_count * sizeof(AM_TitleEntry));
+        fread(titles, sizeof(AM_TitleEntry), title_count, titles_binary);
+        fclose(titles_binary);
+        return 1;
+    } else {
+        consoleClear();
+        printf("Unable to open file: %s\n", titles_binary_file);
+        refresh();
+        return 0;
+    }
 }
 
 void free_titles() {
@@ -164,9 +172,10 @@ int main() {
         hidScanInput();
         u32 kDown = hidKeysDown();
         if (kDown & KEY_A) {
-            load_titles();
-            check_titles();
-            free_titles();
+            if (load_titles()) {
+                check_titles();
+                free_titles();
+            }
             svcSleepThread(5000000000);
             display_menu();
         }
