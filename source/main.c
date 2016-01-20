@@ -30,10 +30,22 @@ void refresh() {
 
 void display_menu() {
     consoleClear();
-    printf("press (A) to check titles\n");
-    printf("press (X) to output titles to file\n");
-    printf("press (B) to return on Homebrew Launcher\n");
+    printf("Press (A) to check titles\n");
+    printf("Press (X) to output titles to file\n");
+    printf("Press (B) to return on Homebrew Launcher\n");
     refresh();
+}
+
+void pause() {
+    printf("Press (A) to continue\n");
+    refresh();
+    while (aptMainLoop()) {
+        hidScanInput();
+        u32 kDown = hidKeysDown();
+        if (kDown & KEY_A) {
+            break;
+        }
+    }
 }
 
 void log_titles() {
@@ -67,6 +79,7 @@ void log_titles() {
     free(installed_titles);
     printf("complete.\n");
     refresh();
+    pause();
 }
 
 int load_titles() {
@@ -162,6 +175,7 @@ void check_titles() {
     free(installed_titles);
     printf("Complete.\n");
     refresh();
+    pause();
 }
 
 int main() {
@@ -176,12 +190,10 @@ int main() {
                 check_titles();
                 free_titles();
             }
-            svcSleepThread(5000000000);
             display_menu();
         }
         if (kDown & KEY_X) {
             log_titles();
-            svcSleepThread(5000000000);
             display_menu();
         }
         if (kDown & KEY_B) {
