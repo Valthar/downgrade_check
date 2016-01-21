@@ -31,7 +31,6 @@ void refresh() {
 void display_menu() {
     consoleClear();
     printf("Press (A) to check titles\n");
-    printf("Press (X) to output titles to file\n");
     printf("Press (B) to return on Homebrew Launcher\n");
     refresh();
 }
@@ -46,40 +45,6 @@ void pause() {
             break;
         }
     }
-}
-
-void log_titles() {
-    consoleClear();
-    printf("Writing installed titles to file... ");
-    refresh();
-    amInit();
-    u32 installed_title_count = 0;
-    AM_GetTitleCount(MEDIATYPE_NAND, &installed_title_count);
-    u64 * installed_title_ids = malloc(installed_title_count * sizeof(u64));
-    AM_GetTitleIdList(MEDIATYPE_NAND, installed_title_count, installed_title_ids);
-    AM_TitleEntry * installed_titles = malloc(installed_title_count * sizeof(AM_TitleEntry));
-    AM_ListTitles(MEDIATYPE_NAND, installed_title_count, installed_title_ids, installed_titles);
-    amExit();
-    free(installed_title_ids);
-    FILE * output = fopen("title_lists.py", "wb");
-    fprintf(output, "title_lists = {\n    'my_title_list.bin': (\n");
-    for (u32 i = 0; i < installed_title_count; i++) {
-        if ((installed_titles[i].titleID & 0xffffffff00000000LL) == 0x0004800400000000LL)
-            continue;
-        if ((i % 5) == 0)
-            fprintf(output, "        ");
-        fprintf(output, "(0x%016llx, 0x%04x),", installed_titles[i].titleID, installed_titles[i].version);
-        if (((i + 1) % 5) == 0 || i == (installed_title_count - 1))
-            fprintf(output, "\n");
-        else
-            fprintf(output, " ");
-    }
-    fprintf(output, "    ),\n}\n");
-    fclose(output);
-    free(installed_titles);
-    printf("complete.\n");
-    refresh();
-    pause();
 }
 
 int load_titles() {
@@ -190,10 +155,6 @@ int main() {
                 check_titles();
                 free_titles();
             }
-            display_menu();
-        }
-        if (kDown & KEY_X) {
-            log_titles();
             display_menu();
         }
         if (kDown & KEY_B) {
