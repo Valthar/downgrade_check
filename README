@@ -4,7 +4,8 @@ when checking but it will also output them to a file called "check.log" inside
 this homebrew's folder.
 
 It currently supports versions:
-  * N3DS 9.0.0-20J/E/U
+  * N3DS 9.0.0-20E/J/U
   * N3DS 9.1.0-20J
-  * N3DS 9.2.0-20J/E/U
-  * O3DS 9.2.0-20E/U
+  * N3DS 9.2.0-20E/J/U
+  * O3DS 9.0.0-20E/J/U
+  * O3DS 9.2.0-20E/J/U
