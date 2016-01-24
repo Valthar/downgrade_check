@@ -1,11 +1,14 @@
 This homebrew will check all your installed NAND titles and compare them to the
-ones that "should" be installed on your system. It will display any differences
+ones that "should" be installed on 9.2.0-20U. It will display any differences
 when checking but it will also output them to a file called "check.log" inside
 this homebrew's folder.
 
-It currently supports versions:
-  * N3DS 9.0.0-20E/J/U
-  * N3DS 9.1.0-20J
-  * N3DS 9.2.0-20E/J/U
-  * O3DS 9.0.0-20E/J/U
-  * O3DS 9.2.0-20E/J/U
+version 2.0 adds:
+- organized formatted 3ds output with title descriptons from yls8.mtheall.com
+- change.log output also revamped for tidyness
+- decimal version #'s instead of hex as this is what 3dbrew.org uses
+- readable title list log 'installed_titles.log' for a detailed inventory of your 3ds NAND
+- rename any title list binary to default.bin and it will be selected regardless of system firmware
+for devs:
+- _titleListExtract.py to extract a title list binary from an update pack
+- index.html to get title struct info for description.h from yls8.mtheall.com. see file for details
