@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Nintendo System Update reports</title>
+</head>
+
+<body>
+
+<table id="1">
+<!-- Place the contents of the table in yls8.mtheall.com full firmware soap reports here. Make sure the id="1" remains! -->
+<!-- When you open the page you should have nicely formatted struct elements to use in homebrew. -->
+</table>
+
+<script>
+function GetCellValues() {
+        var table = document.getElementById('1');
+		str="";
+		id="";
+        for (var r = 1; r < table.rows.length; r++) {
+                id=table.rows[r].cells[0].innerHTML
+                des=table.rows[r].cells[2].innerHTML;
+				str+=('{0x'+id+',"'+des+'"},<br>');
+        }
+		table.innerHTML=str
+}
+GetCellValues();
+</script>
+
+</body></html>
